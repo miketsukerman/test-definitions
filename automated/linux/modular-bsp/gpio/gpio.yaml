@@ -30,6 +30,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/gpio
     - bash gpio.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt

@@ -26,6 +26,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/pwm
     - bash pwm.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt

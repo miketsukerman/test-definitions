@@ -40,6 +40,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/gpu
     - bash gpu.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt

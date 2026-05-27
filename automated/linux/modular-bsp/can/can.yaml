@@ -32,6 +32,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/can
     - bash can.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt
