@@ -4,6 +4,7 @@
 # LAVA handles recovery by waiting for the board to reboot, re-login, and
 # re-run the post-resume test phase via the expect_response pattern.
 #
+# Config source: conf/rom2620-ed91_modbsp/rtc/params.yaml
 # Fill in device_type and deploy/boot as for the main job.
 ---
 device_type: advantech-rom2620  # TODO: set to your lab's device type
@@ -20,7 +21,7 @@ timeouts:
     minutes: 5
 
 metadata:
-  source: https://github.com/miketsukerman/yocto-auto
+  source: https://github.com/miketsukerman/test-definitions
   board: ROM-2620-ED91
   bsp: ModBSP
   test: rtc-suspend
@@ -56,12 +57,12 @@ actions:
       timeout:
         minutes: 10
       definitions:
-        - repository: https://github.com/miketsukerman/yocto-auto.git
+        - repository: https://github.com/miketsukerman/test-definitions.git
           from: git
           branch: main
-          path: qa/lava/rtc/rtc-suspend.yaml
+          path: automated/linux/modular-bsp/rtc/rtc-suspend.yaml
           name: adv-rtc-suspend
           parameters:
             RTC_DEV: /dev/rtc0
             SLEEP_STATE: mem
-            WAKE_SLEEP_TIME_S: "5"
+            WAKE_SLEEP_TIME_S: 5

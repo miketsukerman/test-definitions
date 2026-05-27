@@ -6,6 +6,7 @@
 # writes the result BEFORE firing the watchdog so LAVA can pick it up
 # after the board comes back up.
 #
+# Config source: conf/rom2620-ed91_modbsp/watchdog/params.yaml
 # Fill in device_type and deploy/boot as for the main job.
 ---
 device_type: advantech-rom2620  # TODO: set to your lab's device type
@@ -22,7 +23,7 @@ timeouts:
     minutes: 5
 
 metadata:
-  source: https://github.com/miketsukerman/yocto-auto
+  source: https://github.com/miketsukerman/test-definitions
   board: ROM-2620-ED91
   bsp: ModBSP
   test: watchdog-reboot
@@ -58,11 +59,11 @@ actions:
       timeout:
         minutes: 10
       definitions:
-        - repository: https://github.com/miketsukerman/yocto-auto.git
+        - repository: https://github.com/miketsukerman/test-definitions.git
           from: git
           branch: main
-          path: qa/lava/watchdog/watchdog-reboot.yaml
+          path: automated/linux/modular-bsp/watchdog/watchdog-reboot.yaml
           name: adv-watchdog-reboot
           parameters:
             WATCHDOG_DEV: /dev/watchdog0
-            WATCHDOG_TIMEOUT_S: "60"
+            WATCHDOG_TIMEOUT_S: 60
