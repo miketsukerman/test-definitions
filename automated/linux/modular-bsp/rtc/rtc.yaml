@@ -25,6 +25,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/rtc
     - bash rtc.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt

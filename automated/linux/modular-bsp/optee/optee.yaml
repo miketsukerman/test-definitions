@@ -21,6 +21,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/optee
     - bash optee.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt

@@ -23,6 +23,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/watchdog
     - bash watchdog-reboot.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt
