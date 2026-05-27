@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 #
 # audio.sh
 #
@@ -21,12 +22,11 @@ create_out_dir
 check_audio_device() {
     local mode="$1"   # pb or cap
     local n="$2"
-    local cmd card controller dev_id codec label req_base
+    local cmd card controller codec req_base
 
     case "${mode}" in
     pb)
         cmd="aplay"
-        label="playback"
         eval "card=\${AUDIO_PB${n}_CARD}"
         eval "controller=\${AUDIO_PB${n}_CONTROLLER}"
         eval "codec=\${AUDIO_PB${n}_CODEC}"
@@ -34,7 +34,6 @@ check_audio_device() {
         ;;
     cap)
         cmd="arecord"
-        label="recording"
         eval "card=\${AUDIO_CAP${n}_CARD}"
         eval "controller=\${AUDIO_CAP${n}_CONTROLLER}"
         eval "codec=\${AUDIO_CAP${n}_CODEC}"

@@ -1,5 +1,5 @@
 metadata:
-  format: Lava-Test-Definition 1.0
+  format: Lava-Test Test Definition 1.0
   name: adv-spi
   description: >
     Advantech BSP QA – SPI device checks: verifies that each configured

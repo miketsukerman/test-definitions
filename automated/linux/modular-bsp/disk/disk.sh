@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 #
 # disk.sh
 #
@@ -48,7 +49,7 @@ fi
 # ─── Per-disk checks ──────────────────────────────────────────────────────────
 
 file_read_test() {
-    local dev="$1" type="$2" bsz="$3" cnt="$4" minsp="$5" req_id="$6"
+    local dev="$1" bsz="$2" cnt="$3" minsp="$4" req_id="$5"
     local tmpf
     tmpf=$(mktemp /tmp/disk_read_test.XXXXXX)
     drop_caches
@@ -76,7 +77,7 @@ file_read_test() {
 }
 
 fs_write_test() {
-    local dev="$1" type="$2" bsz="$3" cnt="$4" minsp="$5" req_id="$6"
+    local dev="$1" bsz="$2" cnt="$3" minsp="$4" req_id="$5"
     local mnt tmpf
     mnt=$(mktemp -d /tmp/disk_write_test.XXXXXX)
     # Find a writable partition on the device
@@ -173,13 +174,13 @@ while [ "${n}" -lt "${DISK_COUNT}" ]; do
 
     # Read throughput (functional)
     if [ "${min_rs}" -gt 0 ] 2>/dev/null; then
-        file_read_test "${dev}" "${dtype}" 100000 1000 "${min_rs}" \
+        file_read_test "${dev}" 100000 1000 "${min_rs}" \
             "L-DISK-READ-THROUGHPUT-F-disk${n}"
     fi
 
     # Write throughput (functional)
     if [ "${min_ws}" -gt 0 ] 2>/dev/null; then
-        fs_write_test "${dev}" "${dtype}" 100000 1000 "${min_ws}" \
+        fs_write_test "${dev}" 100000 1000 "${min_ws}" \
             "L-DISK-WRITE-THROUGHPUT-F-disk${n}"
     fi
 

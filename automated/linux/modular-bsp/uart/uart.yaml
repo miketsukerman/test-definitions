@@ -1,5 +1,5 @@
 metadata:
-  format: Lava-Test-Definition 1.0
+  format: Lava-Test Test Definition 1.0
   name: adv-uart
   description: >
     Advantech BSP QA – UART checks: device node existence, bus controller,
