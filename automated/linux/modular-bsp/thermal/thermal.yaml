@@ -24,6 +24,6 @@ params:
 
 run:
   steps:
-    - cd "${TESTPATH}"
+    - cd ./automated/linux/modular-bsp/thermal
     - bash thermal.sh
     - bash ../utils/send-to-lava.sh ./output/result.txt
