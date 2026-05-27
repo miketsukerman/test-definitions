@@ -1,5 +1,5 @@
 metadata:
-  format: Lava-Test-Definition 1.0
+  format: Lava-Test Test Definition 1.0
   name: adv-optee
   description: >
     Advantech BSP QA – OP-TEE checks: TEE device node existence and xtest

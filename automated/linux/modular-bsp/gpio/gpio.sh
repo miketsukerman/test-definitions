@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 #
 # gpio.sh
 #
@@ -79,7 +80,6 @@ sgpio="/sys/class/gpio"
 
 for pin_spec in ${GPIO_PINS}; do
     # Format: <chip>:<pin>:<direction[.edge]>:<label>
-    chip_lbl=$(echo "${pin_spec}" | awk -F: '{print $1}')
     pin=$(echo "${pin_spec}"      | awk -F: '{print $2}')
     dir_edge=$(echo "${pin_spec}" | awk -F: '{print $3}')
     pin_label=$(echo "${pin_spec}"| awk -F: '{print $4}')

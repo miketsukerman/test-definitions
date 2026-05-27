@@ -1,5 +1,5 @@
 metadata:
-  format: Lava-Test-Definition 1.0
+  format: Lava-Test Test Definition 1.0
   name: adv-ram
   description: >
     Advantech BSP QA – RAM checks: verifies each RAM slot's size (MB) and

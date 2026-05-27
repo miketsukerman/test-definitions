@@ -87,7 +87,7 @@ report_metric() {
 run_adv_test() {
     local id="$1"
     shift
-    if eval "$@" >/dev/null 2>&1; then
+    if "$@" >/dev/null 2>&1; then
         report_pass "$id"
         return 0
     else

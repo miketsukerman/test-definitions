@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 #
 # gpu.sh
 #
@@ -19,13 +20,11 @@ create_out_dir
 
 # ─── GL/GLES/EGL library checks ──────────────────────────────────────────────
 
-for lib in GL; do
-    if ldconfig -p 2>/dev/null | grep -q "lib${lib}.so"; then
-        report_pass "L-GPU-OPENGL-F"
-    else
-        report_fail "L-GPU-OPENGL-F"
-    fi
-done
+if ldconfig -p 2>/dev/null | grep -q "libGL.so"; then
+    report_pass "L-GPU-OPENGL-F"
+else
+    report_fail "L-GPU-OPENGL-F"
+fi
 
 for lib in EGL GLESv2; do
     if ldconfig -p 2>/dev/null | grep -q "lib${lib}.so"; then
