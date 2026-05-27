@@ -49,10 +49,12 @@ def parse_conf(path: str) -> Dict[str, Dict[str, str]]:
             if m:
                 current_array = m.group(1)
                 # May have entries on the same line
-                rest = line[m.end():]
+                rest = line[m.end() :]
                 for em in ENTRY_RE.finditer(rest):
                     key, v_quoted, v_bare = em.groups()
-                    arrays[current_array][key] = (v_quoted if v_quoted is not None else v_bare)
+                    arrays[current_array][key] = (
+                        v_quoted if v_quoted is not None else v_bare
+                    )
                 continue
 
             # Closing paren ends the array block
@@ -63,14 +65,17 @@ def parse_conf(path: str) -> Dict[str, Dict[str, str]]:
             if current_array:
                 for em in ENTRY_RE.finditer(line):
                     key, v_quoted, v_bare = em.groups()
-                    arrays[current_array][key] = (v_quoted if v_quoted is not None else v_bare)
+                    arrays[current_array][key] = (
+                        v_quoted if v_quoted is not None else v_bare
+                    )
 
     return dict(arrays)
 
 
 # ─── Key-naming helpers ───────────────────────────────────────────────────────
 
-F3 = "·"   # U+00B7 MIDDLE DOT
+F3 = "·"  # U+00B7 MIDDLE DOT
+
 
 def split_key(raw_key: str):
     """Return (instance, subkey) from a raw array key like 'eth0·dev'."""
@@ -98,7 +103,7 @@ def to_yaml_scalar(value: str) -> str:
     if not value:
         return '""'
     # Quote if the string contains characters that may confuse YAML parsers
-    if re.search(r'[:#\[\]{}|>&*!,?@`%]', value) or value[0] in '"\'':
+    if re.search(r"[:#\[\]{}|>&*!,?@`%]", value) or value[0] in "\"'":
         # Use double-quotes; escape internal double-quotes
         return '"' + value.replace('"', '\\"') + '"'
     return value
@@ -116,6 +121,7 @@ def write_yaml(path: str, params: Dict[str, str]) -> None:
 
 # ─── Per-module converters ────────────────────────────────────────────────────
 
+
 def conv_context(sw: Dict, cpu: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {}
     p["DISTRO_ID"] = sw.get("distro:id", "")
@@ -131,9 +137,9 @@ def conv_thermal(thermal: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {"THERMAL_COUNT": str(len(insts))}
     for idx, inst in enumerate(insts):
         pfx = f"TZ{idx}"
-        p[f"{pfx}_DEV"]  = thermal.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_MIN"]  = thermal.get(f"{inst}{F3}min", "10")
-        p[f"{pfx}_MAX"]  = thermal.get(f"{inst}{F3}max", "95")
+        p[f"{pfx}_DEV"] = thermal.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_MIN"] = thermal.get(f"{inst}{F3}min", "10")
+        p[f"{pfx}_MAX"] = thermal.get(f"{inst}{F3}max", "95")
     return p
 
 
@@ -142,9 +148,9 @@ def conv_i2c(i2c: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {"I2C_COUNT": str(len(insts))}
     for idx, inst in enumerate(insts):
         pfx = f"I2C{idx}"
-        p[f"{pfx}_DEV"]        = i2c.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_DEV"] = i2c.get(f"{inst}{F3}dev", "")
         p[f"{pfx}_CONTROLLER"] = i2c.get(f"{inst}{F3}controller", "")
-        p[f"{pfx}_REFERENCE"]  = i2c.get(f"{inst}{F3}reference", "")
+        p[f"{pfx}_REFERENCE"] = i2c.get(f"{inst}{F3}reference", "")
     return p
 
 
@@ -153,9 +159,9 @@ def conv_pwm(pwm: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {"PWM_COUNT": str(len(insts))}
     for idx, inst in enumerate(insts):
         pfx = f"PWM{idx}"
-        p[f"{pfx}_DEV"]       = pwm.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_BUS"]       = pwm.get(f"{inst}{F3}bus", "")
-        p[f"{pfx}_BUS_ID"]    = pwm.get(f"{inst}{F3}bus_id", "")
+        p[f"{pfx}_DEV"] = pwm.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_BUS"] = pwm.get(f"{inst}{F3}bus", "")
+        p[f"{pfx}_BUS_ID"] = pwm.get(f"{inst}{F3}bus_id", "")
         p[f"{pfx}_REFERENCE"] = pwm.get(f"{inst}{F3}reference", "")
     p["PWM_BACKLIGHT_DEV"] = pwm.get("backlight-dev", "")
     return p
@@ -174,21 +180,21 @@ def conv_npu(npu: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {"NPU_COUNT": str(max(len(insts), 1))}
     for idx, inst in enumerate(insts):
         pfx = f"NPU{idx}"
-        p[f"{pfx}_DEV"]              = npu.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_BUS"]              = npu.get(f"{inst}{F3}bus", "")
-        p[f"{pfx}_BUS_ID"]           = npu.get(f"{inst}{F3}bus_id", "")
-        p[f"{pfx}_BUS_DEVICE_TYPE"]  = npu.get(f"{inst}{F3}bus_device_type", "")
-        p[f"{pfx}_BUS_NODE_NAME"]    = npu.get(f"{inst}{F3}bus_node_name", "")
+        p[f"{pfx}_DEV"] = npu.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_BUS"] = npu.get(f"{inst}{F3}bus", "")
+        p[f"{pfx}_BUS_ID"] = npu.get(f"{inst}{F3}bus_id", "")
+        p[f"{pfx}_BUS_DEVICE_TYPE"] = npu.get(f"{inst}{F3}bus_device_type", "")
+        p[f"{pfx}_BUS_NODE_NAME"] = npu.get(f"{inst}{F3}bus_node_name", "")
     return p
 
 
 def conv_cpu(cpu: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {
-        "CPU_MODEL":             cpu.get("model", ""),
-        "CPU_NPROC":             cpu.get("nproc", ""),
-        "CPU_CSTATES":           cpu.get("cstates", ""),
-        "CPU_SCALING_MIN":       cpu.get("scaling-min", "0"),
-        "CPU_SCALING_MAX":       cpu.get("scaling-max", "0"),
+        "CPU_MODEL": cpu.get("model", ""),
+        "CPU_NPROC": cpu.get("nproc", ""),
+        "CPU_CSTATES": cpu.get("cstates", ""),
+        "CPU_SCALING_MIN": cpu.get("scaling-min", "0"),
+        "CPU_SCALING_MAX": cpu.get("scaling-max", "0"),
         "CPU_SCALING_GOVERNORS": cpu.get("scaling-governors", ""),
         "CPU_SUSPENSION_STATES": cpu.get("suspension", ""),
     }
@@ -199,10 +205,10 @@ def conv_ram(ram: Dict) -> Dict[str, str]:
     insts = instances_of(ram)
     p: Dict[str, str] = {
         "RAM_SLOT_COUNT": str(len(insts)),
-        "RAM_MIN_AVAIL":  ram.get("min-avail", "800"),
+        "RAM_MIN_AVAIL": ram.get("min-avail", "800"),
     }
     for idx, inst in enumerate(insts):
-        p[f"RAM_SLOT{idx}_SIZE"]  = ram.get(f"{inst}{F3}size", "")
+        p[f"RAM_SLOT{idx}_SIZE"] = ram.get(f"{inst}{F3}size", "")
         p[f"RAM_SLOT{idx}_SPEED"] = ram.get(f"{inst}{F3}speed", "")
     return p
 
@@ -211,36 +217,38 @@ def conv_disk(disk: Dict) -> Dict[str, str]:
     insts = instances_of(disk)
     insts = [i for i in insts if i not in ("rootfs",)]
     p: Dict[str, str] = {
-        "DISK_COUNT":        str(len(insts)),
+        "DISK_COUNT": str(len(insts)),
         "DISK_ROOTFS_MOUNT": disk.get("rootfs:mount", ""),
     }
     for idx, inst in enumerate(insts):
         pfx = f"DISK{idx}"
-        p[f"{pfx}_DEV"]     = disk.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_TYPE"]    = disk.get(f"{inst}{F3}type", "")
+        p[f"{pfx}_DEV"] = disk.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_TYPE"] = disk.get(f"{inst}{F3}type", "")
         p[f"{pfx}_SECTORS"] = disk.get(f"{inst}{F3}sectors", "0")
-        p[f"{pfx}_MIN_RS"]  = disk.get(f"{inst}{F3}min-rs", "0")
-        p[f"{pfx}_MIN_WS"]  = disk.get(f"{inst}{F3}min-ws", "0")
+        p[f"{pfx}_MIN_RS"] = disk.get(f"{inst}{F3}min-rs", "0")
+        p[f"{pfx}_MIN_WS"] = disk.get(f"{inst}{F3}min-ws", "0")
     return p
 
 
 def conv_eth(eth: Dict) -> Dict[str, str]:
     insts = instances_of(eth)
     p: Dict[str, str] = {
-        "ETH_COUNT":         str(len(insts)),
-        "IPERF3_SERVER_IP":  "",
-        "IPERF3_DURATION":   "5",
+        "ETH_COUNT": str(len(insts)),
+        "IPERF3_SERVER_IP": "",
+        "IPERF3_DURATION": "5",
     }
     for idx, inst in enumerate(insts):
         pfx = f"ETH{idx}"
-        p[f"{pfx}_DEV"]          = eth.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_BUS"]          = eth.get(f"{inst}{F3}bus", "")
-        p[f"{pfx}_BUS_ID"]       = eth.get(f"{inst}{F3}bus_id", "")
-        p[f"{pfx}_LINK"]         = eth.get(f"{inst}{F3}link", "")
-        p[f"{pfx}_WOL_FEATURED"] = eth.get(f"{inst}{F3}wol:featured") or \
-                                    eth.get(f"{inst}{F3}wol-featured", "")
-        p[f"{pfx}_WOL_WAKEUP"]   = eth.get(f"{inst}{F3}wol:enabled") or \
-                                    eth.get(f"{inst}{F3}wol-wakeup", "")
+        p[f"{pfx}_DEV"] = eth.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_BUS"] = eth.get(f"{inst}{F3}bus", "")
+        p[f"{pfx}_BUS_ID"] = eth.get(f"{inst}{F3}bus_id", "")
+        p[f"{pfx}_LINK"] = eth.get(f"{inst}{F3}link", "")
+        p[f"{pfx}_WOL_FEATURED"] = eth.get(f"{inst}{F3}wol:featured") or eth.get(
+            f"{inst}{F3}wol-featured", ""
+        )
+        p[f"{pfx}_WOL_WAKEUP"] = eth.get(f"{inst}{F3}wol:enabled") or eth.get(
+            f"{inst}{F3}wol-wakeup", ""
+        )
         p[f"{pfx}_MIN_TX_SPEED"] = eth.get(f"{inst}{F3}min-tx-speed", "0")
         p[f"{pfx}_MIN_RX_SPEED"] = eth.get(f"{inst}{F3}min-rx-speed", "0")
     return p
@@ -252,13 +260,13 @@ def conv_uart(uart: Dict) -> Dict[str, str]:
     for idx, inst in enumerate(insts):
         pfx = f"UART{idx}"
         lt = uart.get(f"{inst}{F3}loopback-test", "skip")
-        p[f"{pfx}_DEV"]             = uart.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_BUS"]             = uart.get(f"{inst}{F3}bus", "")
-        p[f"{pfx}_BUS_ID"]          = uart.get(f"{inst}{F3}bus_id", "")
-        p[f"{pfx}_HWFC"]            = uart.get(f"{inst}{F3}hwfc", "0")
-        p[f"{pfx}_DEBUG_CONSOLE"]   = uart.get(f"{inst}{F3}debug-console", "0")
-        p[f"{pfx}_LOOPBACK_TEST"]   = lt
-        p[f"{pfx}_REFERENCE"]       = uart.get(f"{inst}{F3}reference", "")
+        p[f"{pfx}_DEV"] = uart.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_BUS"] = uart.get(f"{inst}{F3}bus", "")
+        p[f"{pfx}_BUS_ID"] = uart.get(f"{inst}{F3}bus_id", "")
+        p[f"{pfx}_HWFC"] = uart.get(f"{inst}{F3}hwfc", "0")
+        p[f"{pfx}_DEBUG_CONSOLE"] = uart.get(f"{inst}{F3}debug-console", "0")
+        p[f"{pfx}_LOOPBACK_TEST"] = lt
+        p[f"{pfx}_REFERENCE"] = uart.get(f"{inst}{F3}reference", "")
     return p
 
 
@@ -266,16 +274,18 @@ def conv_can(can: Dict) -> Dict[str, str]:
     insts = [i for i in instances_of(can) if i != "ext-loopback-tests"]
     ext = can.get("ext-loopback-tests", "")
     p: Dict[str, str] = {
-        "CAN_COUNT":         str(len(insts)),
-        "CAN_EXT_LOOPBACK":  ext,
+        "CAN_COUNT": str(len(insts)),
+        "CAN_EXT_LOOPBACK": ext,
     }
     for idx, inst in enumerate(insts):
         pfx = f"CAN{idx}"
-        p[f"{pfx}_DEV"]               = can.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_BUS"]               = can.get(f"{inst}{F3}bus", "")
-        p[f"{pfx}_BUS_ID"]            = can.get(f"{inst}{F3}bus_id", "")
-        p[f"{pfx}_CLOCK"]             = can.get(f"{inst}{F3}clock", "")
-        p[f"{pfx}_LOOPBACK_SPEEDS"]   = can.get(f"{inst}{F3}loopback-test-speeds", "125000 500000")
+        p[f"{pfx}_DEV"] = can.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_BUS"] = can.get(f"{inst}{F3}bus", "")
+        p[f"{pfx}_BUS_ID"] = can.get(f"{inst}{F3}bus_id", "")
+        p[f"{pfx}_CLOCK"] = can.get(f"{inst}{F3}clock", "")
+        p[f"{pfx}_LOOPBACK_SPEEDS"] = can.get(
+            f"{inst}{F3}loopback-test-speeds", "125000 500000"
+        )
     return p
 
 
@@ -283,14 +293,14 @@ def conv_gpio(gpio: Dict) -> Dict[str, str]:
     insts = instances_of(gpio)
     p: Dict[str, str] = {
         "GPIO_COUNT": str(len(insts)),
-        "GPIO_PINS":  "",
+        "GPIO_PINS": "",
     }
     for idx, inst in enumerate(insts):
         pfx = f"GPIO{idx}"
-        p[f"{pfx}_DEV"]        = gpio.get(f"{inst}{F3}dev", "")
-        p[f"{pfx}_CHIP"]       = gpio.get(f"{inst}{F3}chip", "")
+        p[f"{pfx}_DEV"] = gpio.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_CHIP"] = gpio.get(f"{inst}{F3}chip", "")
         p[f"{pfx}_CONTROLLER"] = gpio.get(f"{inst}{F3}controller", "")
-        p[f"{pfx}_NLINES"]     = gpio.get(f"{inst}{F3}nlines", "0")
+        p[f"{pfx}_NLINES"] = gpio.get(f"{inst}{F3}nlines", "0")
     return p
 
 
@@ -303,15 +313,15 @@ def conv_usb(usb: Dict, cfgc_usb: Dict) -> Dict[str, str]:
         if inst not in insts:
             insts.append(inst)
     p: Dict[str, str] = {
-        "USB_DEV_COUNT":   str(len(insts)),
+        "USB_DEV_COUNT": str(len(insts)),
         "USB_OTG_ENABLED": "1" if usb.get("otg", "n") in ("y", "1") else "0",
-        "USB_OTG_CONF":    cfgc_usb.get("otg-conf", ""),
+        "USB_OTG_CONF": cfgc_usb.get("otg-conf", ""),
     }
     for idx, inst in enumerate(insts):
         pfx = f"USB_DEV{idx}"
-        p[f"{pfx}_PORT"]   = usb.get(f"{inst}{F3}port", "")
+        p[f"{pfx}_PORT"] = usb.get(f"{inst}{F3}port", "")
         p[f"{pfx}_DRIVER"] = usb.get(f"{inst}{F3}driver", "")
-        p[f"{pfx}_SPEED"]  = usb.get(f"{inst}{F3}speed", "")
+        p[f"{pfx}_SPEED"] = usb.get(f"{inst}{F3}speed", "")
     return p
 
 
@@ -320,14 +330,14 @@ def conv_rtc(rtc: Dict) -> Dict[str, str]:
     p: Dict[str, str] = {"RTC_COUNT": str(len(insts))}
     for idx, inst in enumerate(insts):
         pfx = f"RTC{idx}"
-        p[f"{pfx}_DEV"]    = rtc.get(f"{inst}{F3}dev", "")
+        p[f"{pfx}_DEV"] = rtc.get(f"{inst}{F3}dev", "")
         p[f"{pfx}_WAKEUP"] = rtc.get(f"{inst}{F3}wakeup", "")
     # First RTC is also used for suspend
     if insts:
         inst0 = insts[0]
-        p["RTC_SUSPEND_DEV"]           = rtc.get(f"{inst0}{F3}dev", "/dev/rtc0")
-        p["RTC_SUSPEND_SLEEP_STATE"]   = "mem"
-        p["RTC_SUSPEND_WAKE_SLEEP_S"]  = rtc.get(f"{inst0}{F3}wake-sleep-time-s", "5")
+        p["RTC_SUSPEND_DEV"] = rtc.get(f"{inst0}{F3}dev", "/dev/rtc0")
+        p["RTC_SUSPEND_SLEEP_STATE"] = "mem"
+        p["RTC_SUSPEND_WAKE_SLEEP_S"] = rtc.get(f"{inst0}{F3}wake-sleep-time-s", "5")
     return p
 
 
@@ -345,12 +355,12 @@ def conv_tpm(tpm: Dict) -> Dict[str, str]:
     for idx, inst in enumerate(insts):
         pfx = f"TPM{idx}"
         caps = tpm.get(f"{inst}{F3}tpm2:caps", "")
-        ver  = "2" if caps else "1"
-        p[f"{pfx}_DEV"]    = tpm.get(f"{inst}{F3}dev", "")
+        ver = "2" if caps else "1"
+        p[f"{pfx}_DEV"] = tpm.get(f"{inst}{F3}dev", "")
         p[f"{pfx}_VERSION"] = ver
         p[f"{pfx}_MANUF1"] = tpm.get(f"{inst}{F3}manuf1", "")
         p[f"{pfx}_MANUF2"] = tpm.get(f"{inst}{F3}manuf2", "")
-        p[f"{pfx}_CAPS"]   = caps
+        p[f"{pfx}_CAPS"] = caps
     return p
 
 
@@ -363,91 +373,93 @@ def conv_audio(aplayback: Dict, acapture: Dict) -> Dict[str, str]:
     cap_insts = instances_of(acapture)
     p: Dict[str, str] = {
         "AUDIO_PLAYBACK_COUNT": str(len(pb_insts)),
-        "AUDIO_CAPTURE_COUNT":  str(len(cap_insts)),
+        "AUDIO_CAPTURE_COUNT": str(len(cap_insts)),
     }
     for idx, inst in enumerate(pb_insts):
         pfx = f"AUDIO_PB{idx}"
-        p[f"{pfx}_CARD"]       = aplayback.get(f"{inst}{F3}card", "")
+        p[f"{pfx}_CARD"] = aplayback.get(f"{inst}{F3}card", "")
         p[f"{pfx}_CONTROLLER"] = aplayback.get(f"{inst}{F3}controller", "")
-        p[f"{pfx}_DEV_ID"]     = aplayback.get(f"{inst}{F3}dev-id", "")
-        p[f"{pfx}_CODEC"]      = aplayback.get(f"{inst}{F3}codec", "")
+        p[f"{pfx}_DEV_ID"] = aplayback.get(f"{inst}{F3}dev-id", "")
+        p[f"{pfx}_CODEC"] = aplayback.get(f"{inst}{F3}codec", "")
     for idx, inst in enumerate(cap_insts):
         pfx = f"AUDIO_CAP{idx}"
-        p[f"{pfx}_CARD"]       = acapture.get(f"{inst}{F3}card", "")
+        p[f"{pfx}_CARD"] = acapture.get(f"{inst}{F3}card", "")
         p[f"{pfx}_CONTROLLER"] = acapture.get(f"{inst}{F3}controller", "")
-        p[f"{pfx}_DEV_ID"]     = acapture.get(f"{inst}{F3}dev-id", "")
-        p[f"{pfx}_CODEC"]      = acapture.get(f"{inst}{F3}codec", "")
+        p[f"{pfx}_DEV_ID"] = acapture.get(f"{inst}{F3}dev-id", "")
+        p[f"{pfx}_CODEC"] = acapture.get(f"{inst}{F3}codec", "")
     return p
 
 
 def conv_gpu(gpu: Dict) -> Dict[str, str]:
-    insts = [i for i in instances_of(gpu)
-             if i not in ("desktop", "va")]
+    insts = [i for i in instances_of(gpu) if i not in ("desktop", "va")]
     p: Dict[str, str] = {
-        "GPU_COUNT":   str(len(insts)),
+        "GPU_COUNT": str(len(insts)),
         "GPU_WAYLAND": gpu.get("desktop:wayland", ""),
         "GPU_VA_CODECS": gpu.get("va:codecs", ""),
     }
     for idx, inst in enumerate(insts):
         pfx = f"GPU{idx}"
-        p[f"{pfx}_DRI_KMS_DEV"]          = gpu.get(f"{inst}{F3}dri-kms-dev", "")
-        p[f"{pfx}_BACKLIGHT_DEV"]         = gpu.get(f"{inst}{F3}backlight-dev", "")
-        p[f"{pfx}_LVDS_MOD"]              = gpu.get(f"{inst}{F3}lvds-mod", "")
-        p[f"{pfx}_LVDS_DEV"]              = gpu.get(f"{inst}{F3}lvds-dev", "")
-        p[f"{pfx}_DRM_CONNECTOR"]         = gpu.get(f"{inst}{F3}drm-connector", "")
-        p[f"{pfx}_DRM_CONNECTOR_ENCODER"] = gpu.get(f"{inst}{F3}drm-connector-encoder", "")
-        p[f"{pfx}_RESOLUTION"]            = gpu.get(f"{inst}{F3}resolution", "")
-        p[f"{pfx}_REFRESH_RATE"]          = gpu.get(f"{inst}{F3}refresh-rate", "")
+        p[f"{pfx}_DRI_KMS_DEV"] = gpu.get(f"{inst}{F3}dri-kms-dev", "")
+        p[f"{pfx}_BACKLIGHT_DEV"] = gpu.get(f"{inst}{F3}backlight-dev", "")
+        p[f"{pfx}_LVDS_MOD"] = gpu.get(f"{inst}{F3}lvds-mod", "")
+        p[f"{pfx}_LVDS_DEV"] = gpu.get(f"{inst}{F3}lvds-dev", "")
+        p[f"{pfx}_DRM_CONNECTOR"] = gpu.get(f"{inst}{F3}drm-connector", "")
+        p[f"{pfx}_DRM_CONNECTOR_ENCODER"] = gpu.get(
+            f"{inst}{F3}drm-connector-encoder", ""
+        )
+        p[f"{pfx}_RESOLUTION"] = gpu.get(f"{inst}{F3}resolution", "")
+        p[f"{pfx}_REFRESH_RATE"] = gpu.get(f"{inst}{F3}refresh-rate", "")
     return p
 
 
 # ─── Module registry ─────────────────────────────────────────────────────────
 
+
 def generate_all(arrays: Dict[str, Dict[str, str]], out_dir: str) -> None:
-    sw      = arrays.get("CFGA_SW", {})
-    cpu     = arrays.get("CFGA_CPU", {})
+    sw = arrays.get("CFGA_SW", {})
+    cpu = arrays.get("CFGA_CPU", {})
     thermal = arrays.get("CFGA_THERMAL", {})
-    i2c     = arrays.get("CFGA_I2C", {})
-    pwm     = arrays.get("CFGA_PWM", {})
-    spi     = arrays.get("CFGA_SPI", {})
-    npu     = arrays.get("CFGA_NPU", {})
-    ram     = arrays.get("CFGA_RAM", {})
-    disk    = arrays.get("CFGA_DISK", {})
-    eth     = arrays.get("CFGA_ETH", {})
-    uart    = arrays.get("CFGA_UART", {})
-    can     = arrays.get("CFGA_CAN", {})
-    gpio    = arrays.get("CFGA_GPIO", {})
-    usb     = arrays.get("CFGA_USB", {})
+    i2c = arrays.get("CFGA_I2C", {})
+    pwm = arrays.get("CFGA_PWM", {})
+    spi = arrays.get("CFGA_SPI", {})
+    npu = arrays.get("CFGA_NPU", {})
+    ram = arrays.get("CFGA_RAM", {})
+    disk = arrays.get("CFGA_DISK", {})
+    eth = arrays.get("CFGA_ETH", {})
+    uart = arrays.get("CFGA_UART", {})
+    can = arrays.get("CFGA_CAN", {})
+    gpio = arrays.get("CFGA_GPIO", {})
+    usb = arrays.get("CFGA_USB", {})
     cfgc_usb = arrays.get("CFGC_USB", {})
-    rtc     = arrays.get("CFGA_RTC", {})
-    wdog    = arrays.get("CFGA_WATCHDOG", {})
-    tpm     = arrays.get("CFGA_TPM", {})
-    optee   = arrays.get("CFGA_OPTEE", {})
-    apb     = arrays.get("CFGA_APLAYBACK", {})
-    acap    = arrays.get("CFGA_ACAPTURE", {})
-    gpu     = arrays.get("CFGA_GPU", {})
+    rtc = arrays.get("CFGA_RTC", {})
+    wdog = arrays.get("CFGA_WATCHDOG", {})
+    tpm = arrays.get("CFGA_TPM", {})
+    optee = arrays.get("CFGA_OPTEE", {})
+    apb = arrays.get("CFGA_APLAYBACK", {})
+    acap = arrays.get("CFGA_ACAPTURE", {})
+    gpu = arrays.get("CFGA_GPU", {})
 
     modules = {
-        "context":  conv_context(sw, cpu),
-        "thermal":  conv_thermal(thermal),
-        "i2c":      conv_i2c(i2c),
-        "pwm":      conv_pwm(pwm),
-        "spi":      conv_spi(spi),
-        "npu":      conv_npu(npu),
-        "cpu":      conv_cpu(cpu),
-        "ram":      conv_ram(ram),
-        "disk":     conv_disk(disk),
-        "eth":      conv_eth(eth),
-        "uart":     conv_uart(uart),
-        "can":      conv_can(can),
-        "gpio":     conv_gpio(gpio),
-        "usb":      conv_usb(usb, cfgc_usb),
-        "rtc":      conv_rtc(rtc),
+        "context": conv_context(sw, cpu),
+        "thermal": conv_thermal(thermal),
+        "i2c": conv_i2c(i2c),
+        "pwm": conv_pwm(pwm),
+        "spi": conv_spi(spi),
+        "npu": conv_npu(npu),
+        "cpu": conv_cpu(cpu),
+        "ram": conv_ram(ram),
+        "disk": conv_disk(disk),
+        "eth": conv_eth(eth),
+        "uart": conv_uart(uart),
+        "can": conv_can(can),
+        "gpio": conv_gpio(gpio),
+        "usb": conv_usb(usb, cfgc_usb),
+        "rtc": conv_rtc(rtc),
         "watchdog": conv_watchdog(wdog),
-        "tpm":      conv_tpm(tpm),
-        "optee":    conv_optee(optee),
-        "audio":    conv_audio(apb, acap),
-        "gpu":      conv_gpu(gpu),
+        "tpm": conv_tpm(tpm),
+        "optee": conv_optee(optee),
+        "audio": conv_audio(apb, acap),
+        "gpu": conv_gpu(gpu),
     }
 
     for mod, params in modules.items():
@@ -458,19 +470,22 @@ def generate_all(arrays: Dict[str, Dict[str, str]], out_dir: str) -> None:
 
 # ─── CLI ─────────────────────────────────────────────────────────────────────
 
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description="Convert Advantech .conf to LAVA params YAML files"
     )
     ap.add_argument("conf", help="Path to the board .conf file")
     ap.add_argument(
-        "--out-dir", "-o",
+        "--out-dir",
+        "-o",
         default=os.path.join(os.path.dirname(__file__), "..", "lava"),
-        help="Output root directory (default: ../lava relative to this script)"
+        help="Output root directory (default: ../lava relative to this script)",
     )
     ap.add_argument(
-        "--module", "-m",
-        help="Only generate YAML for this module (default: all modules)"
+        "--module",
+        "-m",
+        help="Only generate YAML for this module (default: all modules)",
     )
     args = ap.parse_args()
 

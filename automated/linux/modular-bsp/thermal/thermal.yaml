@@ -1,5 +1,5 @@
 metadata:
-  format: Lava-Test-Definition 1.0
+  format: Lava-Test Test Definition 1.0
   name: adv-thermal
   description: >
     Advantech BSP QA – Thermal zone checks: verifies that each configured
