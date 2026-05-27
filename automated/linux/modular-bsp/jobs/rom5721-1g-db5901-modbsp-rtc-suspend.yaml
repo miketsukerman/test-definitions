@@ -1,0 +1,68 @@
+# LAVA Job Definition – ROM5721-1G-DB5901 ModBSP RTC Suspend/Wakeup Test
+# This is a SEPARATE job because suspend-to-RAM resets the LAVA serial session.
+#
+# LAVA handles recovery by waiting for the board to reboot, re-login, and
+# re-run the post-resume test phase via the expect_response pattern.
+#
+# Config source: conf/rom5721-1g-db5901_modbsp/rtc/params.yaml
+# Fill in device_type and deploy/boot as for the main job.
+---
+device_type: advantech-rom5721  # TODO: set to your lab's device type
+job_name: "Advantech ROM5721-1G-DB5901 – RTC Suspend/Wakeup"
+visibility: public
+priority: medium
+
+timeouts:
+  job:
+    minutes: 15
+  action:
+    minutes: 5
+  connection:
+    minutes: 5
+
+metadata:
+  source: https://github.com/miketsukerman/test-definitions
+  board: ROM5721-1G-DB5901
+  bsp: ModBSP
+  test: rtc-suspend
+
+actions:
+
+  - deploy:
+      timeout:
+        minutes: 10
+      to: tftp
+      kernel:
+        url: http://images.example.com/rom5721-1g-db5901/Image  # TODO
+        type: image
+      dtb:
+        url: http://images.example.com/rom5721-1g-db5901/rom5721-1g-db5901-modbsp.dtb  # TODO
+      ramdisk:
+        url: http://images.example.com/rom5721-1g-db5901/rootfs.cpio.gz  # TODO
+        compression: gz
+
+  - boot:
+      timeout:
+        minutes: 5
+      method: u-boot
+      commands: nfs
+      auto_login:
+        login_prompt: "login:"
+        username: root
+      prompts:
+        - "root@.*:.*#"
+        - "\\$"
+
+  - test:
+      timeout:
+        minutes: 10
+      definitions:
+        - repository: https://github.com/miketsukerman/test-definitions.git
+          from: git
+          branch: main
+          path: automated/linux/modular-bsp/rtc/rtc-suspend.yaml
+          name: adv-rtc-suspend
+          parameters:
+            RTC_DEV: /dev/rtc0
+            SLEEP_STATE: mem
+            WAKE_SLEEP_TIME_S: 5
